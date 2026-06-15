@@ -1,4 +1,7 @@
 package com.fitting.notificationservice.entity;
 
-public class NotificationStatus {
+public enum NotificationStatus {
+    PENDING,   // pendiente de envío
+    SENT,      // enviada exitosamente
+    FAILED     // falló el envío
 }
