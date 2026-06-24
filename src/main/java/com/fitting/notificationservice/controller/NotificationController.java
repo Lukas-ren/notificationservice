@@ -6,6 +6,9 @@ import com.fitting.notificationservice.entity.NotificationStatus;
 import com.fitting.notificationservice.entity.NotificationType;
 import com.fitting.notificationservice.service.NotificationService;
 import com.fitting.notificationservice.util.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Slf4j
+@Tag(name = "Notificaciones", description = "Gestión del historial de notificaciones")
 @RestController
 @RequestMapping("/api/v1/notifications")
 @RequiredArgsConstructor
@@ -22,6 +26,8 @@ public class NotificationController {
 
     private final NotificationService notificationService;
 
+    @Operation(summary = "Crear notificación")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "Notificación creada")
     @PostMapping
     public ResponseEntity<ApiResponse<NotificationResponse>> create(
             @Valid @RequestBody NotificationRequest request) {
@@ -31,6 +37,7 @@ public class NotificationController {
                         notificationService.create(request)));
     }
 
+    @Operation(summary = "Listar notificaciones")
     @GetMapping
     public ResponseEntity<ApiResponse<List<NotificationResponse>>> findAll() {
         log.info("GET /api/v1/notifications");
@@ -38,6 +45,7 @@ public class NotificationController {
                 notificationService.findAll()));
     }
 
+    @Operation(summary = "Buscar notificación por ID")
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<NotificationResponse>> findById(@PathVariable Long id) {
         log.info("GET /api/v1/notifications/{}", id);
@@ -45,6 +53,7 @@ public class NotificationController {
                 notificationService.findById(id)));
     }
 
+    @Operation(summary = "Notificaciones por destinatario")
     @GetMapping("/recipient/{email}")
     public ResponseEntity<ApiResponse<List<NotificationResponse>>> findByEmail(
             @PathVariable String email) {
@@ -53,6 +62,7 @@ public class NotificationController {
                 notificationService.findByRecipientEmail(email)));
     }
 
+    @Operation(summary = "Filtrar por estado")
     @GetMapping("/status/{status}")
     public ResponseEntity<ApiResponse<List<NotificationResponse>>> findByStatus(
             @PathVariable NotificationStatus status) {
@@ -61,6 +71,7 @@ public class NotificationController {
                 notificationService.findByStatus(status)));
     }
 
+    @Operation(summary = "Filtrar por tipo")
     @GetMapping("/type/{type}")
     public ResponseEntity<ApiResponse<List<NotificationResponse>>> findByType(
             @PathVariable NotificationType type) {
@@ -69,6 +80,7 @@ public class NotificationController {
                 notificationService.findByType(type)));
     }
 
+    @Operation(summary = "Notificaciones por referencia")
     @GetMapping("/reference/{referenceId}")
     public ResponseEntity<ApiResponse<List<NotificationResponse>>> findByReferenceId(
             @PathVariable Long referenceId) {
@@ -77,6 +89,11 @@ public class NotificationController {
                 notificationService.findByReferenceId(referenceId)));
     }
 
+    @Operation(summary = "Marcar notificación como enviada")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Marcada como enviada"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Solo se pueden marcar notificaciones en PENDING")
+    })
     @PatchMapping("/{id}/sent")
     public ResponseEntity<ApiResponse<NotificationResponse>> markAsSent(@PathVariable Long id) {
         log.info("PATCH /api/v1/notifications/{}/sent", id);
@@ -84,6 +101,7 @@ public class NotificationController {
                 notificationService.markAsSent(id)));
     }
 
+    @Operation(summary = "Marcar notificación como fallida")
     @PatchMapping("/{id}/failed")
     public ResponseEntity<ApiResponse<NotificationResponse>> markAsFailed(@PathVariable Long id) {
         log.info("PATCH /api/v1/notifications/{}/failed", id);
@@ -91,6 +109,7 @@ public class NotificationController {
                 notificationService.markAsFailed(id)));
     }
 
+    @Operation(summary = "Eliminar notificación")
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
         log.info("DELETE /api/v1/notifications/{}", id);
